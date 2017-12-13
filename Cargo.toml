@@ -2,6 +2,10 @@
 name = "xmz-client"
 version = "0.1.1"
 authors = ["Stefan Müller <s.mueller@it.kls-glt.de>"]
+documentation = "https://github.com/zzeroo/xmz-client"
+repository = "https://github.com/zzeroo/xmz-client.git"
+homepage = "https://github.com/zzeroo/xmz-client"
+
 
 [dependencies]
 clap = "2.28"
