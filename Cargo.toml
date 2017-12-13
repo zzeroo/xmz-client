@@ -1,0 +1,10 @@
+[package]
+name = "xmz-client"
+version = "0.1.0"
+authors = ["Stefan Müller <s.mueller@it.kls-glt.de>"]
+
+[dependencies]
+clap = "2.28"
+failure = "0.1"
+# libmodbus-rs = { git = "https://github.com/zzeroo/libmodbus-rs.git", branch = "no-bindgen" }
+libmodbus-rs = { path = "../libmodbus-rs"}
