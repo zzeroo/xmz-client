@@ -3,7 +3,13 @@ trait Outputs {
     fn status(&self) -> bool;
 }
 
+#[derive(Clone, Debug)]
 struct ShiftRegister;
+impl ShiftRegister {
+    fn new() -> Self {
+        ShiftRegister
+    }
+}
 
 struct MetzConnectDO4;
 
@@ -30,7 +36,7 @@ impl Outputs for MetzConnectDO4 {
 struct Server<T>
     where T: Outputs + Clone
 {
-    leds: Vec<T>,
+    leds: Vec<Box<T>>,
 }
 
 impl<T> Server<T>
@@ -38,7 +44,7 @@ impl<T> Server<T>
 {
     fn new() -> Self {
         Server {
-            leds: vec![ShiftRegister::new()],
+            leds: vec![],
         }
     }
 }
@@ -47,7 +53,7 @@ impl<T> Server<T>
 fn main() {
     println!("Test Server Struktur");
 
-    let server = Server::new();
+    let server: Server<ShiftRegister> = Server::new();
 
     println!("{:?}", server);
 }
