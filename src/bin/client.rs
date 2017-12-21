@@ -11,6 +11,7 @@ use libmodbus_rs::{
     ModbusRTU,
     ModbusTCP,
     ModbusTCPPI,
+    RequestToSendMode,
 };
 
 
@@ -88,6 +89,7 @@ fn run(matches: &ArgMatches) -> Result<(), Error> {
             println!("{:?}", dest);
         },
         "0x05" | "5" | "write_bit"              => {
+            modbus.rtu_set_rts(RequestToSendMode::RtuRtsDown)?;
             modbus.write_bit(address, value).context("Could not write single coil")?;
         },
         "0x08" | "8" | "diagnostic"                  => {

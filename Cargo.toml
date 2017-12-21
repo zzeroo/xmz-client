@@ -1,6 +1,6 @@
 [package]
 name = "xmz-client"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Stefan Müller <s.mueller@it.kls-glt.de>"]
 documentation = "https://github.com/zzeroo/xmz-client"
 repository = "https://github.com/zzeroo/xmz-client.git"
