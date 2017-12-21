@@ -1,3 +1,10 @@
+// Testaufbau aller wichtiger Komponenten der xMZ-Mod-Touch Plattform
+//
+// Diese Datei sollte alle essentialen Komponenten der xMZ-Mod-Touch Server Komponente beinhalten.
+
+// Realis (ShifrRegister), LEDs (ShiftRegister), Modbus Schaltmodule (MetzConnectDO4)
+//
+// Es ist noch nicht ganz klar ob dieses Trait wirklich gebraucht wird.
 trait Outputs {
     fn set(&mut self, status: bool);
     fn status(&self) -> bool;

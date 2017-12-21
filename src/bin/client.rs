@@ -11,8 +11,6 @@ use libmodbus_rs::{
     ModbusRTU,
     ModbusTCP,
     ModbusTCPPI,
-    SerialMode,
-    Timeout,
 };
 
 
@@ -36,11 +34,14 @@ fn run(matches: &ArgMatches) -> Result<(), Error> {
         value_t!(matches, "slave_id", u8)?
     } else { unreachable!() };
 
+    // Data Bits
+    let data_bits = value_t!(matches, "data_bits", i32)?;
+
     let mut modbus = match backend {
         Backend::RTU => {
             let serial_interface = matches.value_of("serial_interface").unwrap(); // We can unwrap here because clap ensures via default_value that we have a default value here.
             let baud = value_t!(matches, "baud", i32).unwrap(); // Here we also can just unwrap, clap saves our aes here as well.
-            let mut modbus = Modbus::new_rtu(&serial_interface, baud, 'N', 8, 1).expect("Unable to create modbus RTU context");
+            let mut modbus = Modbus::new_rtu(&serial_interface, baud, 'N', data_bits, 1).expect("Unable to create modbus RTU context");
             // modbus.rtu_set_serial_mode(SerialMode::RtuRS232).expect("Could not set RTU mode");
             modbus.set_slave(slave_id).expect("Could not set slave id");
             modbus
@@ -54,9 +55,6 @@ fn run(matches: &ArgMatches) -> Result<(), Error> {
             modbus
         },
     };
-
-    // Data Bits
-    let data_bits = value_t!(matches, "data_bits", u8)?;
 
     if matches.is_present("debug") {
         modbus.set_debug(true).expect("Could not set DEBUG mode");
@@ -85,22 +83,19 @@ fn run(matches: &ArgMatches) -> Result<(), Error> {
         "0x03" | "3" | "read_registers"         => println!("read registers"),
         "0x04" | "4" | "read_input_registers"   => {
             let mut dest = vec![0u16; Modbus::MAX_READ_REGISTERS as usize];
-            modbus.set_byte_timeout(Timeout::new_sec(1));
             modbus.read_input_registers(0, 4, &mut dest).context("Could not read input registers")?;
 
             println!("{:?}", dest);
         },
         "0x05" | "5" | "write_bit"              => {
-            modbus.write_bit(address, value).context("Could not write single coil");
+            modbus.write_bit(address, value).context("Could not write single coil")?;
         },
         "0x08" | "8" | "diagnostic"                  => {
             // let mut raw_request = vec![slave_id, FunctionCode::Diagnostic as u8, 0x0000, 0xBEEF];
             // Neustart
-            let mut raw_request = vec![slave_id, FunctionCode::Diagnostic as u8, 0x0001, 0xEFBE];
+            let mut raw_request = vec![slave_id, FunctionCode::Diagnostic as u8, 0x0001, 0x0034];
             let mut response = vec![0u8; Modbus::RTU_MAX_ADU_LENGTH];
             let len = raw_request.len();
-
-            modbus.set_byte_timeout(Timeout::new_sec(1));
 
             println!("send_raw_request {:?}", modbus.send_raw_request(&mut raw_request, len));
             match modbus.receive_confirmation(&mut response) {
@@ -123,7 +118,7 @@ fn main() {
         .about("Console Client for 'xMZ-Mod-Touch'-Platform")
         .author("Stefan Müller <s.mueller@it.kls-glt.de>")
         .arg(Arg::with_name("address")
-            .help("Address")
+            .help("Modbus Address to request")
             .long("address")
             .takes_value(true)
             .short("a")
